@@ -31,7 +31,9 @@ public class AccountService {
     private final TransactionalOperator transactionalOperator;
 
     public Mono<AccountDto> createAccount(CreateAccountDto account) {
-        return accountRepository.save(createAccountToEntity(account)).map(AccountConverter::entityToDto);
+        return accountRepository.save(createAccountToEntity(account))
+                .doOnSuccess(entity -> log.info("Account created with id: {}", entity.getId()))
+                .map(AccountConverter::entityToDto);
     }
 
     public Mono<BigDecimal> getAccountBalance(Long id) {
@@ -76,7 +78,8 @@ public class AccountService {
                                             .receiver(receiverId)
                                             .date(LocalDateTime.now(ZoneOffset.UTC))
                                             .build()
-                            ));
+                            ))
+                            .doOnSuccess(entity -> log.info("Transaction proceeded successfully"));
                 })
         ).then();
     }
