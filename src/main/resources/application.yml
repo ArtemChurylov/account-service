@@ -8,3 +8,7 @@ spring:
     locations: classpath:db/migration
     user: ${spring.r2dbc.username}
     password: ${spring.r2dbc.password}
+
+springdoc:
+  swagger-ui:
+    path: /api-docs
