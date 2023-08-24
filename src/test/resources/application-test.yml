@@ -1,0 +1,7 @@
+spring:
+  r2dbc:
+    url: r2dbc:pool:postgres://localhost:${POSTGRES_PORT}/test
+    username: test
+    password: test
+  flyway:
+    url: jdbc:postgresql://localhost:${POSTGRES_PORT}/test

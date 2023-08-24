@@ -8,3 +8,5 @@ Step by step:
 - Open terminal in the project root
 - Run docker compose `docker-compose up -d`
 - Run application
+
+### To run tests you need to have docker environment as well
