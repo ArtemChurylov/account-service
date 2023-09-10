@@ -1,8 +1,8 @@
-package com.example.finmid.integration
+package com.example.finance.integration
 
-import com.example.finmid.dto.AccountDto
-import com.example.finmid.entinty.AccountEntity
-import com.example.finmid.repository.AccountRepository
+import com.example.finance.dto.AccountDto
+import com.example.finance.entinty.AccountEntity
+import com.example.finance.repository.AccountRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.slf4j.LoggerFactory

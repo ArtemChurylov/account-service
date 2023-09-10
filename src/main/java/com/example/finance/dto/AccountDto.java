@@ -1,4 +1,4 @@
-package com.example.finmid.dto;
+package com.example.finance.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

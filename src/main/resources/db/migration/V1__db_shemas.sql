@@ -2,7 +2,8 @@ CREATE TABLE accounts (
     id SERIAL PRIMARY KEY,
     balance NUMERIC(12, 4) NOT NULL,
     create_date TIMESTAMP NOT NULL,
-    modify_date TIMESTAMP NOT NULL
+    modify_date TIMESTAMP NOT NULL,
+    version INTEGER NOT NULL
 );
 
 CREATE TABLE transactions (

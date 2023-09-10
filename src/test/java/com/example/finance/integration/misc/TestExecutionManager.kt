@@ -1,4 +1,4 @@
-package com.example.finmid.integration.misc
+package com.example.finance.integration.misc
 
 import org.junit.platform.launcher.TestExecutionListener
 import org.junit.platform.launcher.TestPlan

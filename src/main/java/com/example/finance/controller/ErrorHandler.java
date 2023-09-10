@@ -1,7 +1,7 @@
-package com.example.finmid.controller;
+package com.example.finance.controller;
 
-import com.example.finmid.exception.AccountNotFoundException;
-import com.example.finmid.exception.InsufficientFundsException;
+import com.example.finance.exception.AccountNotFoundException;
+import com.example.finance.exception.InsufficientFundsException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;

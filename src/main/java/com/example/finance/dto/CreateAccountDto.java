@@ -1,4 +1,4 @@
-package com.example.finmid.response;
+package com.example.finance.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,11 +7,11 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-@Data
 @Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccountBalanceResponse {
+public class CreateAccountDto {
 
     private BigDecimal balance;
 }

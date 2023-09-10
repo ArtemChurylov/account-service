@@ -1,8 +1,8 @@
-package com.example.finmid.converter;
+package com.example.finance.converter;
 
-import com.example.finmid.dto.AccountDto;
-import com.example.finmid.dto.CreateAccountDto;
-import com.example.finmid.entinty.AccountEntity;
+import com.example.finance.dto.AccountDto;
+import com.example.finance.dto.CreateAccountDto;
+import com.example.finance.entinty.AccountEntity;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;

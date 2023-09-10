@@ -1,9 +1,9 @@
-package com.example.finmid.controller;
+package com.example.finance.controller;
 
-import com.example.finmid.dto.AccountDto;
-import com.example.finmid.dto.CreateAccountDto;
-import com.example.finmid.response.AccountBalanceResponse;
-import com.example.finmid.service.AccountService;
+import com.example.finance.dto.AccountDto;
+import com.example.finance.dto.CreateAccountDto;
+import com.example.finance.response.AccountBalanceResponse;
+import com.example.finance.service.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

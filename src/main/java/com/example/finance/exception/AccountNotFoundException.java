@@ -1,4 +1,4 @@
-package com.example.finmid.exception;
+package com.example.finance.exception;
 
 import static java.lang.String.format;
 

@@ -1,4 +1,5 @@
 ## account-service
+A dummy money transfer service written in Spring WebFlux and Spring Data R2DBC
 
 ### API docs url - http://localhost:8080/api-docs
 

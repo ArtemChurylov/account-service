@@ -1,10 +1,11 @@
-package com.example.finmid.entinty;
+package com.example.finance.entinty;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
@@ -22,4 +23,6 @@ public class AccountEntity {
     private BigDecimal balance;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
+    @Version
+    private Long version;
 }

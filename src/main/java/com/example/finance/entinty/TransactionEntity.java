@@ -1,4 +1,4 @@
-package com.example.finmid.entinty;
+package com.example.finance.entinty;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

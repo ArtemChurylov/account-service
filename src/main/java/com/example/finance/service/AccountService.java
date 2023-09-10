@@ -1,14 +1,14 @@
-package com.example.finmid.service;
+package com.example.finance.service;
 
-import com.example.finmid.converter.AccountConverter;
-import com.example.finmid.dto.AccountDto;
-import com.example.finmid.dto.CreateAccountDto;
-import com.example.finmid.entinty.AccountEntity;
-import com.example.finmid.entinty.TransactionEntity;
-import com.example.finmid.exception.AccountNotFoundException;
-import com.example.finmid.exception.InsufficientFundsException;
-import com.example.finmid.repository.AccountRepository;
-import com.example.finmid.repository.TransactionRepository;
+import com.example.finance.converter.AccountConverter;
+import com.example.finance.dto.AccountDto;
+import com.example.finance.dto.CreateAccountDto;
+import com.example.finance.entinty.AccountEntity;
+import com.example.finance.entinty.TransactionEntity;
+import com.example.finance.exception.AccountNotFoundException;
+import com.example.finance.exception.InsufficientFundsException;
+import com.example.finance.repository.AccountRepository;
+import com.example.finance.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-import static com.example.finmid.converter.AccountConverter.createAccountToEntity;
+import static com.example.finance.converter.AccountConverter.createAccountToEntity;
 
 @Slf4j
 @Service

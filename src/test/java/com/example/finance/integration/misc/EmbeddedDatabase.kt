@@ -1,4 +1,4 @@
-package com.example.finmid.integration.misc
+package com.example.finance.integration.misc
 
 import lombok.extern.slf4j.Slf4j
 import org.slf4j.LoggerFactory
