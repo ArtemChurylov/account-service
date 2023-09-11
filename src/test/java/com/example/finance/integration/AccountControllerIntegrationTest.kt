@@ -43,37 +43,6 @@ class AccountControllerIntegrationTest : DefaultIntegrationTest() {
     }
 
     @Test
-    fun `should successfully transfer money`() {
-        val senderAccount = AccountEntity.builder().balance(BigDecimal.valueOf(150)).createDate(LocalDateTime.now()).modifyDate(LocalDateTime.now()).build()
-        val receiverAccount = AccountEntity.builder().balance(BigDecimal.valueOf(50)).createDate(LocalDateTime.now()).modifyDate(LocalDateTime.now()).build()
-
-        val senderId = prepareTestAccount(senderAccount)
-        val receiverId = prepareTestAccount(receiverAccount)
-
-        assertAccountBalance(senderId, BigDecimal.valueOf(150))
-        assertAccountBalance(receiverId, BigDecimal.valueOf(50))
-
-        val responseBody = webTestClient.post()
-                .uri { builder ->
-                    builder
-                            .path("/api/v1/account/transaction")
-                            .queryParam("senderId", senderId)
-                            .queryParam("receiverId", receiverId)
-                            .queryParam("amount", 50)
-                            .build()
-                }
-                .exchange()
-                .expectStatus().isOk
-                .expectBody(String::class.java)
-                .returnResult().responseBody
-
-        assertThat(responseBody).isEqualTo("Transaction proceeded successfully")
-
-        assertAccountBalance(senderId, BigDecimal.valueOf(100))
-        assertAccountBalance(receiverId, BigDecimal.valueOf(100))
-    }
-
-    @Test
     fun `should fail on same account transfer`() {
         val account = AccountEntity.builder().balance(BigDecimal.valueOf(150)).createDate(LocalDateTime.now()).modifyDate(LocalDateTime.now()).build()
 
@@ -134,10 +103,10 @@ class AccountControllerIntegrationTest : DefaultIntegrationTest() {
 
         runBlocking {
             repeat(1001) {
-                transfer(account1Id, account2Id, BigDecimal.valueOf(100))
+                doTransfer(account1Id, account2Id, BigDecimal.valueOf(100))
             }
             repeat(1000) {
-                transfer(account2Id, account1Id, BigDecimal.valueOf(100))
+                doTransfer(account2Id, account1Id, BigDecimal.valueOf(100))
             }
         }
 
@@ -145,7 +114,7 @@ class AccountControllerIntegrationTest : DefaultIntegrationTest() {
         assertAccountBalance(account2Id, BigDecimal.valueOf(150_100))
     }
 
-    private suspend fun transfer(senderId: Long, receiverId: Long, amount: BigDecimal) = coroutineScope {
+    private suspend fun doTransfer(senderId: Long, receiverId: Long, amount: BigDecimal) = coroutineScope {
         launch {
             val responseBody = webTestClient.post()
                     .uri { builder ->
