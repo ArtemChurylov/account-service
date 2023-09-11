@@ -3,6 +3,9 @@ package com.example.finance.integration
 import com.example.finance.dto.AccountDto
 import com.example.finance.dto.CreateAccountDto
 import com.example.finance.entinty.AccountEntity
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -116,5 +119,49 @@ class AccountControllerIntegrationTest : DefaultIntegrationTest() {
                 .returnResult().responseBody
 
         assertThat(responseBody).isEqualTo("Insufficient funds for account: $senderId")
+    }
+
+    @Test
+    fun `should successfully handle concurrent transactions`() {
+        val account1 = AccountEntity.builder().balance(BigDecimal.valueOf(200_000)).createDate(LocalDateTime.now()).modifyDate(LocalDateTime.now()).build()
+        val account2 = AccountEntity.builder().balance(BigDecimal.valueOf(150_000)).createDate(LocalDateTime.now()).modifyDate(LocalDateTime.now()).build()
+
+        val account1Id = prepareTestAccount(account1)
+        val account2Id = prepareTestAccount(account2)
+
+        assertAccountBalance(account1Id, BigDecimal.valueOf(200_000))
+        assertAccountBalance(account2Id, BigDecimal.valueOf(150_000))
+
+        runBlocking {
+            repeat(1001) {
+                transfer(account1Id, account2Id, BigDecimal.valueOf(100))
+            }
+            repeat(1000) {
+                transfer(account2Id, account1Id, BigDecimal.valueOf(100))
+            }
+        }
+
+        assertAccountBalance(account1Id, BigDecimal.valueOf(199_900))
+        assertAccountBalance(account2Id, BigDecimal.valueOf(150_100))
+    }
+
+    private suspend fun transfer(senderId: Long, receiverId: Long, amount: BigDecimal) = coroutineScope {
+        launch {
+            val responseBody = webTestClient.post()
+                    .uri { builder ->
+                        builder
+                                .path("/api/v1/account/transaction")
+                                .queryParam("senderId", senderId)
+                                .queryParam("receiverId", receiverId)
+                                .queryParam("amount", amount)
+                                .build()
+                    }
+                    .exchange()
+                    .expectStatus().isOk
+                    .expectBody(String::class.java)
+                    .returnResult().responseBody
+
+            assertThat(responseBody).isEqualTo("Transaction proceeded successfully")
+        }
     }
 }
