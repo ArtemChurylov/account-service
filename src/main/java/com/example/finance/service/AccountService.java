@@ -11,11 +11,14 @@ import com.example.finance.repository.AccountRepository;
 import com.example.finance.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
@@ -45,42 +48,44 @@ public class AccountService {
             return Mono.error(new IllegalArgumentException("Same sender and receiver, account id: " + senderId));
         }
         return transactionalOperator.execute(status -> accountRepository
-                .findById(senderId)
-                .switchIfEmpty(Mono.error(new AccountNotFoundException(senderId)))
-                .zipWith(accountRepository
-                        .findById(receiverId)
-                        .switchIfEmpty(Mono.error(new AccountNotFoundException(receiverId)))
+                        .findById(senderId)
+                        .switchIfEmpty(Mono.error(new AccountNotFoundException(senderId)))
+                        .zipWith(accountRepository
+                                .findById(receiverId)
+                                .switchIfEmpty(Mono.error(new AccountNotFoundException(receiverId)))
+                        )
+                        .flatMap(tuple2 -> {
+                            AccountEntity sender = tuple2.getT1();
+                            AccountEntity receiver = tuple2.getT2();
+
+                            if (sender.getBalance().compareTo(amount) < 0) {
+                                return Mono.error(new InsufficientFundsException(senderId));
+                            }
+
+                            sender.setBalance(sender.getBalance().subtract(amount));
+                            receiver.setBalance(receiver.getBalance().add(amount));
+
+                            LocalDateTime modifyDate = LocalDateTime.now(ZoneOffset.UTC);
+
+                            sender.setModifyDate(modifyDate);
+                            receiver.setModifyDate(modifyDate);
+
+                            Mono<AccountEntity> senderUpdate = accountRepository.save(sender);
+                            Mono<AccountEntity> receiverUpdate = accountRepository.save(receiver);
+
+                            return Mono.when(senderUpdate, receiverUpdate)
+                                    .then(transactionRepository.save(
+                                            TransactionEntity.builder()
+                                                    .amount(amount)
+                                                    .sender(senderId)
+                                                    .receiver(receiverId)
+                                                    .date(LocalDateTime.now(ZoneOffset.UTC))
+                                                    .build()
+                                    ))
+                                    .doOnSuccess(entity -> log.info("Transaction proceeded successfully"));
+                        })
                 )
-                .flatMap(tuple2 -> {
-                    AccountEntity sender = tuple2.getT1();
-                    AccountEntity receiver = tuple2.getT2();
-
-                    if (sender.getBalance().compareTo(amount) < 0) {
-                        return Mono.error(new InsufficientFundsException(senderId));
-                    }
-
-                    sender.setBalance(sender.getBalance().subtract(amount));
-                    receiver.setBalance(receiver.getBalance().add(amount));
-
-                    LocalDateTime modifyDate = LocalDateTime.now(ZoneOffset.UTC);
-
-                    sender.setModifyDate(modifyDate);
-                    receiver.setModifyDate(modifyDate);
-
-                    Mono<AccountEntity> senderUpdate = accountRepository.save(sender);
-                    Mono<AccountEntity> receiverUpdate = accountRepository.save(receiver);
-
-                    return Mono.when(senderUpdate, receiverUpdate)
-                            .then(transactionRepository.save(
-                                    TransactionEntity.builder()
-                                            .amount(amount)
-                                            .sender(senderId)
-                                            .receiver(receiverId)
-                                            .date(LocalDateTime.now(ZoneOffset.UTC))
-                                            .build()
-                            ))
-                            .doOnSuccess(entity -> log.info("Transaction proceeded successfully"));
-                })
-        ).then();
+                .then()
+                .retryWhen(Retry.backoff(5, Duration.ofSeconds(1)).filter(throwable -> throwable instanceof OptimisticLockingFailureException));
     }
 }

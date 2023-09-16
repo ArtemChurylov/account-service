@@ -5,3 +5,7 @@ spring:
     password: test
   flyway:
     url: jdbc:postgresql://localhost:${POSTGRES_PORT}/test
+
+logging:
+  level:
+    org.springframework: DEBUG
