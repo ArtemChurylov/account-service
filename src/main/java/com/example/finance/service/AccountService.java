@@ -12,6 +12,7 @@ import com.example.finance.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.r2dbc.UncategorizedR2dbcException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;
@@ -86,6 +87,7 @@ public class AccountService {
                         })
                 )
                 .then()
-                .retryWhen(Retry.backoff(5, Duration.ofSeconds(1)).filter(throwable -> throwable instanceof OptimisticLockingFailureException));
+                .retryWhen(Retry.backoff(50, Duration.ofSeconds(1))
+                        .filter(throwable -> throwable instanceof OptimisticLockingFailureException || throwable instanceof UncategorizedR2dbcException));
     }
 }

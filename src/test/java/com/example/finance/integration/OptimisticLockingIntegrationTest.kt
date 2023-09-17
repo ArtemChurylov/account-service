@@ -1,4 +1,4 @@
-package com.example.finance.integration;
+package com.example.finance.integration
 
 import com.example.finance.entinty.AccountEntity
 import com.example.finance.service.AccountService
@@ -58,7 +58,7 @@ class OptimisticLockingIntegrationTest : DefaultIntegrationTest() {
         assertAccountBalance(account2Id, BigDecimal.valueOf(150_100))
     }
 
-    private suspend fun doTransfer(sender: Long, receiver: Long, amount: BigDecimal) = withContext(Dispatchers.Unconfined) {
+    private suspend fun doTransfer(sender: Long, receiver: Long, amount: BigDecimal) = withContext(Dispatchers.IO) {
         delay(Random.nextLong(100))
         accountService.executeTransaction(sender, receiver, amount).block()
     }
