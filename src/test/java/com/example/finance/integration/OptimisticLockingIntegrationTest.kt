@@ -42,15 +42,24 @@ class OptimisticLockingIntegrationTest : DefaultIntegrationTest() {
         assertAccountBalance(account2Id, BigDecimal.valueOf(150_000))
 
         runBlocking {
+            repeat(1001) {
+                launch {
+                    doTransfer(account1Id, account2Id, BigDecimal.valueOf(100))
+                }
+            }
             repeat(1000) {
-                launch(Dispatchers.Unconfined) {
-                    delay(Random.nextLong(100))
-                    accountService.executeTransaction(account1Id, account2Id, BigDecimal.valueOf(100)).block()
+                launch {
+                    doTransfer(account2Id, account1Id, BigDecimal.valueOf(100))
                 }
             }
         }
 
-        assertAccountBalance(account1Id, BigDecimal.valueOf(100_000))
-        assertAccountBalance(account2Id, BigDecimal.valueOf(250_000))
+        assertAccountBalance(account1Id, BigDecimal.valueOf(199_900))
+        assertAccountBalance(account2Id, BigDecimal.valueOf(150_100))
+    }
+
+    private suspend fun doTransfer(sender: Long, receiver: Long, amount: BigDecimal) = withContext(Dispatchers.Unconfined) {
+        delay(Random.nextLong(100))
+        accountService.executeTransaction(sender, receiver, amount).block()
     }
 }
